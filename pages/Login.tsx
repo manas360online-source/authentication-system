@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -17,7 +16,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const res = await authService.login(email, password);
+      const res = await authService.login(email);
       if (res.success && res.data) {
         if (res.data.requireMfa) {
           // Pass email to OTP page via router state or query param
@@ -68,20 +67,6 @@ const Login: React.FC = () => {
           required
           icon={<i className="fa-regular fa-envelope"></i>}
         />
-        <div>
-          <Input 
-            label="Password" 
-            type="password" 
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            icon={<i className="fa-solid fa-lock"></i>}
-          />
-          <div className="flex justify-end mt-1">
-             <button type="button" onClick={() => navigate('/forgot-password')} className="text-sm text-blue-600 hover:text-blue-800 font-medium">Forgot password?</button>
-          </div>
-        </div>
 
         {error && (
           <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg flex items-center gap-2">

@@ -45,12 +45,14 @@ const VerifyOtp: React.FC = () => {
         // Navigate to dashboard
         // Note: For a real app, we'd need to ensure the user object is set in localStorage
         // Here we rely on the flow that the user exists.
-        navigate('/login'); // Force re-login or go to dashboard. 
+        
         // Better UX: For signup verification, go to login. For MFA, go to dashboard.
         if (mode === 'login') {
              // Re-simulate login to get user data easily
-             const loginRes = await authService.login(email, 'password-bypass-for-demo'); // This won't work in real life
+             const loginRes = await authService.login(email); 
              // Since we can't get the user easily without credentials, let's redirect to login with a success message
+             // Or actually, login(email) works now without password, so we can likely just log them in here if we wanted.
+             // But following previous logic:
              navigate('/login'); 
         } else {
              navigate('/login');

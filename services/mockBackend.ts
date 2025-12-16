@@ -56,7 +56,7 @@ class MockBackendService {
 
   // --- Public Methods ---
 
-  async register(email: string, password: string, fullName: string, phone?: string): Promise<ApiResponse<User>> {
+  async register(email: string, fullName: string, phone?: string): Promise<ApiResponse<User>> {
     await delay(800);
     const users = this.getUsers();
     
@@ -69,14 +69,14 @@ class MockBackendService {
       email,
       fullName,
       phone,
-      passwordHash: btoa(password), // Simple encoding for demo purposes
+      passwordHash: '', // No password
       mfaEnabled: false,
       isVerified: false,
       createdAt: new Date().toISOString()
     };
 
     this.saveUser(newUser);
-    this.logEvent(newUser.id, 'SIGNUP', 'success', 'User registered');
+    this.logEvent(newUser.id, 'SIGNUP', 'success', 'User registered (Passwordless)');
     
     // Simulate sending OTP
     console.log(`[Backend] OTP sent to ${email}: 123456`);
@@ -84,7 +84,7 @@ class MockBackendService {
     return { success: true, data: newUser, message: 'Registration successful. Please verify your email.' };
   }
 
-  async login(email: string, password: string): Promise<ApiResponse<{ user: User; token: string; requireMfa?: boolean }>> {
+  async login(email: string): Promise<ApiResponse<{ user: User; token: string; requireMfa?: boolean }>> {
     await delay(800);
 
     // Rate Limiting Logic
@@ -106,17 +106,14 @@ class MockBackendService {
     const users = this.getUsers();
     const user = users.find(u => u.email === email);
 
-    if (!user || user.passwordHash !== btoa(password)) {
+    if (!user) {
       attempt.count++;
       if (attempt.count >= MAX_ATTEMPTS) {
         attempt.lockedUntil = now + RATE_LIMIT_WINDOW;
-        if (user) this.logEvent(user.id, 'ACCOUNT_LOCKED', 'warning', 'Too many failed attempts');
       }
       loginAttempts[email] = attempt;
       
-      if (user) this.logEvent(user.id, 'LOGIN_FAILED', 'failure', 'Invalid credentials');
-      
-      return { success: false, message: 'Invalid email or password' };
+      return { success: false, message: 'User not found' };
     }
 
     // Success - Reset rate limit
@@ -129,7 +126,7 @@ class MockBackendService {
     }
 
     const token = `jwt_mock_${Math.random().toString(36).substr(2)}${Math.random().toString(36).substr(2)}`;
-    this.logEvent(user.id, 'LOGIN_SUCCESS', 'success', 'Login via Password');
+    this.logEvent(user.id, 'LOGIN_SUCCESS', 'success', 'Login via Email');
     
     return { success: true, data: { user, token }, message: 'Login successful' };
   }
