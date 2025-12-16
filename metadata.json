@@ -1,0 +1,5 @@
+{
+  "name": "SecureGuard Auth",
+  "description": "A professional, enterprise-grade authentication system demonstration featuring simulated backend logic for rate limiting, MFA, audit trails, and session management, enhanced with AI security insights.",
+  "requestFramePermissions": []
+}
